@@ -1,0 +1,38 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: phpmyadmin-service
+  labels:
+    app: phpmyadmin
+spec:
+  type: NodePort
+  ports:
+    - port: 5000
+      nodePort: 5000
+      protocol: TCP
+      name: http
+  selector:
+    app: phpmyadmin
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: phpmyadmin-deployment
+  labels:
+    app: phpmyadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+        - name: phpmyadmin
+          image: services/phpmyadmin
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000

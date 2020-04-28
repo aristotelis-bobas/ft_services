@@ -10,8 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-echo "\n\n\e[91m
-
+echo "\e[91m
 
       :::::::::: :::::::::::           ::::::::  :::::::::: :::::::::  :::     ::: ::::::::::: ::::::::  :::::::::: :::::::: 
      :+:            :+:              :+:    :+: :+:        :+:    :+: :+:     :+:     :+:    :+:    :+: :+:       :+:    :+: 
@@ -21,42 +20,50 @@ echo "\n\n\e[91m
  #+#            #+#              #+#    #+# #+#        #+#    #+#   #+#+#+#       #+#    #+#    #+# #+#       #+#    #+#     
 ###            ###    ########## ########  ########## ###    ###     ###     ########### ########  ########## ########       
 
-                                                                                        by abobas@student.codam.nl \n\n"
+                                                                                        by abobas@student.codam.nl \n\e[0m"
 
 #############################################################################################################################
 
 deploy()
 {
-    echo "\e[91mDeploying $1...\e[0m" 
-	kubectl apply -f srcs/yml/$1.yml
-    echo "\e[91mSuccesfully deployed $1 \e[0m"
+    echo "Deploying $1..." 
+	kubectl apply -f srcs/yml/$1.yml > /dev/null
 }
 
 build()
 {
-	echo "\e[91mBuilding $1...\e[0m"
-	docker build -t services/$1 srcs/containers/$1/
-    echo "\e[91mSuccesfully built $1\e[0m"
+	echo "Building $1..."
+	docker build -t services/$1 srcs/containers/$1 > /dev/null
 }
 
-images="nginx mysql phpmyadmin"
-containers="nginx mysql phpmyadmin"
+services="nginx mysql phpmyadmin"
+start=`date +%M`
 
 #############################################################################################################################
 
-if ! brew ; then
-echo "\e[91mHomebrew not found, installing Homebrew...\e[0m"
-curl -fsSL https://rawgit.com/kube/42homebrew/master/install.sh | zsh
-fi
+echo "Cleaning files..."
+minikube delete > /dev/null 2>&1
+docker system prune -f > /dev/null 2>&1
 
-if ! minikube ; then
-echo "\e[91mMinikube not found, installing Minikube...\e[0m"
-brew install minikube
-fi
+#############################################################################################################################
 
-if ! kubectl ; then
-echo "\e[91mKubernetes not found, installing Kubernetes...\e[0m"
-brew install kubectl
-fi
+echo "Setting up minikube..."
+minikube start --cpus=2 --memory 2g --extra-config=apiserver.service-node-port-range=1-6000 > /dev/null 2>&1
+minikube addons enable ingress > /dev/null 2>&1
+eval $(minikube docker-env)
 
-curl https://github.com/alexandregv/42toolbox/blob/master/init_docker.sh
+for service in $services
+do
+	build $service
+    deploy $service
+done
+
+#############################################################################################################################
+
+end=`date +%M`
+runtime=$((end-start))
+ip=`minikube ip`
+
+echo "================================================="
+echo "\e[92mCluster deployed: http://$ip"
+echo "Runtime: $runtime minutes\e[0m"

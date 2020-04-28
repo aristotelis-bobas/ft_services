@@ -1,0 +1,38 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql-service
+  labels:
+    app: mysql
+spec:
+  type: NodePort
+  ports:
+    - port: 5100
+      nodePort: 5100
+      name: mysql
+  selector:
+    app: mysql
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mysql-deployment
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: mysql
+        image: services/mysql
+        imagePullPolicy: Never
+        securityContext:
+          privileged: true
