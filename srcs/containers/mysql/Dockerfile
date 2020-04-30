@@ -11,17 +11,16 @@ RUN 		apk upgrade && \
 # CONFIGRE MYSQL
 RUN 		mkdir -p /run/mysqld && \
             mv /root/my.cnf /etc/mysql/my.cnf
+VOLUME      ["/var/lib/mysql"]
 
-# CONFIGURE USER AND DATABASE
-RUN         mysql_install_db --user=root --verbose && \
+# START SERVICE
+CMD         mysql_install_db --user=root --skip-test-db && \
             touch text && \
             echo "flush privileges;" >> text && \
             echo "grant all privileges on *.* to 'root' identified by 'password' with grant option;" >> text && \
             echo "flush privileges;" >> text && \
             /usr/bin/mysqld --user=root --bootstrap < text && \
-            rm -rf text
-
-# START SERVICE
-CMD         /usr/bin/mysqld --user=root --console
+            rm -rf text && \
+            /usr/bin/mysqld --user=root
 
 
