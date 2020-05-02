@@ -6,7 +6,7 @@ COPY		srcs/. /root/
 
 # INSTALL PACKAGES
 RUN 		apk update && \
-			apk add wget php7 php7-openssl php7-cgi php7-xml php7-pdo php7-mcrypt php7-session php7-mysqli php7-zlib php7-json php-phar php-iconv gd
+			apk add wget curl php-curl php7 php7-openssl php7-cgi php7-xml php7-pdo php7-mcrypt php7-session php7-mysqli php7-zlib php7-json php-phar php-iconv php-gd php-exif php-dom php-fileinfo php-mbstring php-zip zip php-gd php7-opcache
 
 # CONFIGURE WORDPRESS
 RUN			mkdir /www && \

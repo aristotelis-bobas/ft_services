@@ -36,12 +36,6 @@ build()
 	docker build -t services/$1 srcs/containers/$1 > /dev/null 2>&1 & spin
 }
 
-volume()
-{
-    echo -n "\nMounting $1 volume..."
-    kubectl apply -f srcs/yml/$1_volume.yml > /dev/null 2>&1 & spin
-}
-
 spin()
 {
     pid=$!
@@ -62,7 +56,6 @@ spin()
     echo -n " \b\c"
 }
 
-volumes="mysql"
 services="nginx mysql phpmyadmin wordpress"
 start=`date +%s`
 
@@ -78,11 +71,13 @@ rm -rf srcs/containers/wordpress/Dockerfile & spin
 
 echo -n "\nSetting up minikube..."
 minikube start --cpus=2 --memory 2g --extra-config=apiserver.service-node-port-range=1-6000 > /dev/null 2>&1 & spin
+minikube addons enable dashboard > /dev/null 2>&1 & spin
 minikube addons enable ingress > /dev/null 2>&1 & spin
 eval $(minikube docker-env)
 
 #############################################################################################################################
 
+echo -n "\nPreparing files..."
 IP=`minikube ip`
 cp srcs/containers/nginx/srcs/source.html srcs/containers/nginx/srcs/index.html & spin
 cp srcs/containers/wordpress/srcs/Source srcs/containers/wordpress/Dockerfile & spin
@@ -91,11 +86,6 @@ sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/wordpress/Dockerfile & spin
 
 #############################################################################################################################
 
-for volume in $volumes
-do
-    volume $volume
-done
-
 for service in $services
 do
 	build $service
@@ -103,8 +93,6 @@ do
 done
 
 #############################################################################################################################
-
-
 
 end=`date +%s`
 runtime=$((end-start))

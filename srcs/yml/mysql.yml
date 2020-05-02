@@ -40,9 +40,36 @@ spec:
         - name: mysql
           containerPort: 5100
         volumeMounts:
-        - name: mysql-persistent-storage
+        - name: mysql-storage
           mountPath: "/var/lib/mysql"
       volumes:
-      - name: mysql-persistent-storage
+      - name: mysql-storage
         persistentVolumeClaim:
-          claimName: mysql-pv-claim
+          claimName: mysql-claim
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mysql-claim
+spec:
+  storageClassName: manual
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: mysql-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 200Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data"
