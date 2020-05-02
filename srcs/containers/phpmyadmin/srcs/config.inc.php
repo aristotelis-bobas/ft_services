@@ -34,6 +34,8 @@ $cfg['Servers'][$i]['connect_type'] = 'tcp';
 $cfg['Servers'][$i]['compress'] = false;
 $cfg['Servers'][$i]['AllowNoPassword'] = true;
 $cfg['Servers'][$i]['extension'] = 'mysqli';
+$cfg['DefaultCharset'] = 'utf8';
+$cfg['DefaultConnectionCollation'] = 'utf8_general_ci';
 
 $cfg['UploadDir'] = '';
 $cfg['SaveDir'] = '';

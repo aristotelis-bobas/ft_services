@@ -5,7 +5,7 @@ FROM 		alpine
 COPY		srcs/. /root/
 
 # INSTALL PACKAGES
-RUN 		apk upgrade && \
+RUN 		apk update && \
 			apk add nginx openssl openssh openrc
 
 # CONFIGURE SSL

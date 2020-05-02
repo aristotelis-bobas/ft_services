@@ -1,0 +1,38 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: wordpress-service
+  labels:
+    app: wordpress
+spec:
+  type: NodePort
+  ports:
+  - port: 5050
+    nodePort: 5050
+    protocol: TCP
+    name: http
+  selector:
+    app: wordpress
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: wordpress-deployment
+  labels:
+    app: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - name: wordpress
+        image: services/wordpress
+        ports:
+        - containerPort: 5050
+        imagePullPolicy: Never
