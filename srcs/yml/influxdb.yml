@@ -1,0 +1,75 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: influxdb-service
+  labels:
+    app: influxdb
+spec:
+  type: NodePort
+  ports:
+  - port: 8086
+    nodePort: 8086
+    name: influxdb
+  selector:
+    app: influxdb
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: influxdb-deployment
+  labels:
+    app: influxdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: influxdb
+        image: services/influxdb
+        imagePullPolicy: Never
+        securityContext:
+          privileged: true
+        ports:
+        - name: influxdb
+          containerPort: 8086 
+        volumeMounts:
+        - name: influxdb-storage
+          mountPath: "/var/lib/influxdb"
+      volumes:
+      - name: influxdb-storage
+        persistentVolumeClaim:
+          claimName: influxdb-claim
+---
+kind: PersistentVolumeClaim 
+apiVersion: v1
+metadata:
+  name: influxdb-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: influxdb-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 200Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data"

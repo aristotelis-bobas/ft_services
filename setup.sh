@@ -56,7 +56,7 @@ spin()
     echo -n " \b\c"
 }
 
-services="nginx mysql phpmyadmin wordpress"
+services="nginx mysql phpmyadmin wordpress influxdb"
 start=`date +%s`
 
 #############################################################################################################################
@@ -70,14 +70,14 @@ rm -rf srcs/containers/wordpress/Dockerfile & spin
 #############################################################################################################################
 
 echo -n "\nSetting up minikube..."
-minikube start --cpus=2 --memory 2g --extra-config=apiserver.service-node-port-range=1-6000 > /dev/null 2>&1 & spin
+minikube start --cpus=2 --memory 2g --extra-config=apiserver.service-node-port-range=1-9000 > /dev/null 2>&1 & spin
 minikube addons enable dashboard > /dev/null 2>&1 & spin
 minikube addons enable ingress > /dev/null 2>&1 & spin
 eval $(minikube docker-env)
 
 #############################################################################################################################
 
-echo -n "\nPreparing files..."
+echo -n "\nPreparing temporary files..."
 IP=`minikube ip`
 cp srcs/containers/nginx/srcs/source.html srcs/containers/nginx/srcs/index.html & spin
 cp srcs/containers/wordpress/srcs/Source srcs/containers/wordpress/Dockerfile & spin
@@ -91,6 +91,12 @@ do
 	build $service
     deploy $service
 done
+
+#############################################################################################################################
+
+echo -n "\nCleaning temporary files..."
+rm -rf srcs/containers/nginx/srcs/index.html & spin
+rm -rf srcs/containers/wordpress/Dockerfile & spin
 
 #############################################################################################################################
 
