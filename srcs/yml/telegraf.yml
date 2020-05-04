@@ -1,0 +1,45 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: telegraf-service
+  labels:
+    app: telegraf
+spec:
+  type: NodePort
+  ports:
+  - port: 4000
+    nodePort: 4000
+    protocol: TCP
+    name: http
+  selector:
+    app: telegraf
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: telegraf-deployment
+  labels:
+    app: telegraf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telegraf
+  template:
+    metadata:
+      labels:
+        app: telegraf
+    spec:
+      containers:
+      - name: telegraf
+        image: services/telegraf
+        ports:
+        - containerPort: 4000
+        imagePullPolicy: Never
+        volumeMounts:
+        - name: dockersock
+          mountPath: "/var/run/docker.sock"
+      volumes:
+      - name: dockersock
+        hostPath:
+          path: /var/run/docker.sock

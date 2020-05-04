@@ -56,7 +56,7 @@ spin()
     echo -n " \b\c"
 }
 
-services="nginx mysql phpmyadmin wordpress influxdb"
+services="nginx mysql phpmyadmin wordpress influxdb telegraf grafana"
 start=`date +%s`
 
 #############################################################################################################################
@@ -66,6 +66,8 @@ minikube delete > /dev/null 2>&1 & spin
 docker system prune -f > /dev/null 2>&1 & spin
 rm -rf srcs/containers/nginx/srcs/index.html & spin
 rm -rf srcs/containers/wordpress/Dockerfile & spin
+rm -rf srcs/containers/telegraf/srcs/telegraf.conf & spin
+rm -rf srcs/containers/grafana/srcs/datasource.yml & spin
 
 #############################################################################################################################
 
@@ -80,9 +82,13 @@ eval $(minikube docker-env)
 echo -n "\nPreparing temporary files..."
 IP=`minikube ip`
 cp srcs/containers/nginx/srcs/source.html srcs/containers/nginx/srcs/index.html & spin
-cp srcs/containers/wordpress/srcs/Source srcs/containers/wordpress/Dockerfile & spin
 sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/nginx/srcs/index.html & spin
+cp srcs/containers/wordpress/srcs/Source srcs/containers/wordpress/Dockerfile & spin
 sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/wordpress/Dockerfile & spin
+cp srcs/containers/telegraf/srcs/source.conf srcs/containers/telegraf/srcs/telegraf.conf & spin
+sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/telegraf/srcs/telegraf.conf & spin
+cp srcs/containers/grafana/srcs/datasource_source.yml srcs/containers/grafana/srcs/datasource.yml & spin
+sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/grafana/srcs/datasource.yml & spin
 
 #############################################################################################################################
 
@@ -97,6 +103,8 @@ done
 echo -n "\nCleaning temporary files..."
 rm -rf srcs/containers/nginx/srcs/index.html & spin
 rm -rf srcs/containers/wordpress/Dockerfile & spin
+rm -rf srcs/containers/telegraf/srcs/telegraf.conf & spin
+rm -rf srcs/containers/grafana/srcs/datasource.yml & spin
 
 #############################################################################################################################
 

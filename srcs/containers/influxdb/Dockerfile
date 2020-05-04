@@ -3,7 +3,7 @@ FROM 		alpine
 
 # INSTALL PACKAGES
 RUN 		apk update && \
-			apk add influxdb
+			apk add influxdb wget
 
 # START SERVICE
 CMD         influxd

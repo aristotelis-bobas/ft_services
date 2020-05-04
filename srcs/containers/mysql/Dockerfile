@@ -16,6 +16,7 @@ RUN 		mkdir -p /run/mysqld && \
 CMD         mysql_install_db --user=root --skip-test-db --datadir="/var/lib/mysql" && \
             touch text && \
             echo "create database if not exists wordpress;" >> text && \
+            echo "create database if not exists grafana;" >> text && \
             echo "flush privileges;" >> text && \
             echo "grant all privileges on *.* to 'root'@'%' identified by 'password' with grant option;" >> text && \
             echo "flush privileges;" >> text && \

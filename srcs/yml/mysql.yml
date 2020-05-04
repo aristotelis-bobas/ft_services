@@ -9,7 +9,8 @@ spec:
   ports:
     - port: 5100
       nodePort: 5100
-      name: mysql
+      protocol: TCP
+      name: http
   selector:
     app: mysql
 ---
