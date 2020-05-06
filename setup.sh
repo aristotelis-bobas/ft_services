@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-echo "
+echo "\e[91m
 
       :::::::::: :::::::::::           ::::::::  :::::::::: :::::::::  :::     ::: ::::::::::: ::::::::  :::::::::: :::::::: 
      :+:            :+:              :+:    :+: :+:        :+:    :+: :+:     :+:     :+:    :+:    :+: :+:       :+:    :+: 
@@ -20,20 +20,40 @@ echo "
  #+#            #+#              #+#    #+# #+#        #+#    #+#   #+#+#+#       #+#    #+#    #+# #+#       #+#    #+#     
 ###            ###    ########## ########  ########## ###    ###     ###     ########### ########  ########## ########       
 
-                                                                                        by abobas@student.codam.nl \n"
+                                                                                        by abobas@student.codam.nl \n\e[0m"
 
 #############################################################################################################################
 
 deploy()
 {
-    echo "Deploying $1..." 
-	kubectl apply -f srcs/yml/$1.yml > /dev/null 2>&1
+    echo -n "\nDeploying $1..." 
+	kubectl apply -f srcs/yml/$1.yml > /dev/null 2>&1 & spin
 }
 
 build()
 {
-	echo "Building $1..."
-	docker build -t services/$1 srcs/containers/$1 > /dev/null 2>&1
+	echo -n "\nBuilding $1..."
+	docker build -t services/$1 srcs/containers/$1 > /dev/null 2>&1 & spin
+}
+
+spin()
+{
+    pid=$!
+    i=0
+    while ps -a | awk '{print $1}' | grep -q "${pid}"
+    do
+        c=`expr ${i} % 4`
+        case ${c} in
+            0) echo "/\c";;
+            1) echo "-\c";;
+            2) echo "\\ \b\c";;
+            3) echo "|\c";;
+        esac
+        i=`expr ${i} + 1`
+        sleep 0.65
+        echo "\b\c"
+    done
+    echo -n " \b\c"
 }
 
 services="nginx mysql phpmyadmin wordpress influxdb telegraf grafana ftps"
@@ -41,51 +61,37 @@ start=`date +%s`
 
 #############################################################################################################################
 
-which -s brew
-if [[ $? != 0 ]] ; then
-echo "Installing Homebrew..."
-curl -fsSL https://rawgit.com/kube/42homebrew/master/install.sh | zsh > /dev/null 2>&1
-fi
-
-which -s minikube
-if [[ $? != 0 ]] ; then
-echo "Installing Minikube..."
-brew install minikube > /dev/null 2>&1
-fi
+echo -n "\nCleaning files..."
+minikube delete > /dev/null 2>&1 & spin
+docker system prune -f > /dev/null 2>&1 & spin
+rm -rf srcs/containers/nginx/srcs/index.html & spin
+rm -rf srcs/containers/wordpress/Dockerfile & spin
+rm -rf srcs/containers/telegraf/srcs/telegraf.conf & spin
+rm -rf srcs/containers/grafana/srcs/datasource.yml & spin
+rm -rf srcs/containers/ftps/Dockerfile & spin
 
 #############################################################################################################################
 
-echo "Cleaning files..."
-minikube delete > /dev/null 2>&1
-docker system prune -f > /dev/null 2>&1
-rm -rf srcs/containers/nginx/srcs/index.html
-rm -rf srcs/containers/wordpress/Dockerfile
-rm -rf srcs/containers/telegraf/srcs/telegraf.conf
-rm -rf srcs/containers/grafana/srcs/datasource.yml
-rm -rf srcs/containers/ftps/Dockerfile
-
-#############################################################################################################################
-
-echo "Setting up minikube..."
-minikube start --cpus=2 --memory 2g --driver=virtualbox --extra-config=apiserver.service-node-port-range=1-22000 > /dev/null 2>&1
-minikube addons enable dashboard > /dev/null 2>&1
-minikube addons enable ingress > /dev/null 2>&1
+echo -n "\nSetting up minikube..."
+minikube start --cpus=2 --memory 2g --extra-config=apiserver.service-node-port-range=1-22000 > /dev/null 2>&1 & spin
+minikube addons enable dashboard > /dev/null 2>&1 & spin
+minikube addons enable ingress > /dev/null 2>&1 & spin
 eval $(minikube docker-env)
 
 #############################################################################################################################
 
-echo "Preparing temporary files..."
+echo -n "\nPreparing temporary files..."
 IP=`minikube ip`
-cp srcs/containers/nginx/srcs/source.html srcs/containers/nginx/srcs/index.html
-sed -i '' "s/CLUSTER_IP/$IP/g" srcs/containers/nginx/srcs/index.html
-cp srcs/containers/wordpress/srcs/Source srcs/containers/wordpress/Dockerfile
-sed -i '' "s/CLUSTER_IP/$IP/g" srcs/containers/wordpress/Dockerfile
-cp srcs/containers/telegraf/srcs/source.conf srcs/containers/telegraf/srcs/telegraf.conf
-sed -i '' "s/CLUSTER_IP/$IP/g" srcs/containers/telegraf/srcs/telegraf.conf
-cp srcs/containers/grafana/srcs/datasource_source.yml srcs/containers/grafana/srcs/datasource.yml
-sed -i '' "s/CLUSTER_IP/$IP/g" srcs/containers/grafana/srcs/datasource.yml
-cp srcs/containers/ftps/srcs/Source srcs/containers/ftps/Dockerfile
-sed -i '' "s/CLUSTER_IP/$IP/g" srcs/containers/ftps/Dockerfile
+cp srcs/containers/nginx/srcs/source.html srcs/containers/nginx/srcs/index.html & spin
+sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/nginx/srcs/index.html & spin
+cp srcs/containers/wordpress/srcs/Source srcs/containers/wordpress/Dockerfile & spin
+sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/wordpress/Dockerfile & spin
+cp srcs/containers/telegraf/srcs/source.conf srcs/containers/telegraf/srcs/telegraf.conf & spin
+sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/telegraf/srcs/telegraf.conf & spin
+cp srcs/containers/grafana/srcs/datasource_source.yml srcs/containers/grafana/srcs/datasource.yml & spin
+sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/grafana/srcs/datasource.yml & spin
+cp srcs/containers/ftps/srcs/Source srcs/containers/ftps/Dockerfile & spin
+sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/ftps/Dockerfile & spin
 
 #############################################################################################################################
 
@@ -97,12 +103,12 @@ done
 
 #############################################################################################################################
 
-echo "Cleaning temporary files..."
-rm -rf srcs/containers/nginx/srcs/index.html
-rm -rf srcs/containers/wordpress/Dockerfile
-rm -rf srcs/containers/telegraf/srcs/telegraf.conf
-rm -rf srcs/containers/grafana/srcs/datasource.yml
-rm -rf srcs/containers/ftps/Dockerfile
+echo -n "\nCleaning temporary files..."
+rm -rf srcs/containers/nginx/srcs/index.html & spin
+rm -rf srcs/containers/wordpress/Dockerfile & spin
+rm -rf srcs/containers/telegraf/srcs/telegraf.conf & spin
+rm -rf srcs/containers/grafana/srcs/datasource.yml & spin
+rm -rf srcs/containers/ftps/Dockerfile & spin
 
 #############################################################################################################################
 
