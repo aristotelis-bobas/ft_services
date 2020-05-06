@@ -53,12 +53,6 @@ echo "Installing Minikube..."
 brew install minikube > /dev/null 2>&1
 fi
 
-which -s kubectl
-if [[ $? != 0 ]] ; then
-echo "Installing Kubernetes..."
-brew install kubectl > /dev/null 2>&1
-fi
-
 #############################################################################################################################
 
 echo "Cleaning files..."
@@ -73,7 +67,7 @@ rm -rf srcs/containers/ftps/Dockerfile
 #############################################################################################################################
 
 echo "Setting up minikube..."
-minikube start --cpus=2 --memory 2g --extra-config=apiserver.service-node-port-range=1-22000 > /dev/null 2>&1
+minikube start --cpus=2 --memory 2g --driver=virtualbox --extra-config=apiserver.service-node-port-range=1-22000 > /dev/null 2>&1
 minikube addons enable dashboard > /dev/null 2>&1
 minikube addons enable ingress > /dev/null 2>&1
 eval $(minikube docker-env)
@@ -83,15 +77,15 @@ eval $(minikube docker-env)
 echo "Preparing temporary files..."
 IP=`minikube ip`
 cp srcs/containers/nginx/srcs/source.html srcs/containers/nginx/srcs/index.html
-sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/nginx/srcs/index.html
+sed -i '' "s/CLUSTER_IP/$IP/g" srcs/containers/nginx/srcs/index.html
 cp srcs/containers/wordpress/srcs/Source srcs/containers/wordpress/Dockerfile
-sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/wordpress/Dockerfile
+sed -i '' "s/CLUSTER_IP/$IP/g" srcs/containers/wordpress/Dockerfile
 cp srcs/containers/telegraf/srcs/source.conf srcs/containers/telegraf/srcs/telegraf.conf
-sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/telegraf/srcs/telegraf.conf
+sed -i '' "s/CLUSTER_IP/$IP/g" srcs/containers/telegraf/srcs/telegraf.conf
 cp srcs/containers/grafana/srcs/datasource_source.yml srcs/containers/grafana/srcs/datasource.yml
-sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/grafana/srcs/datasource.yml
+sed -i '' "s/CLUSTER_IP/$IP/g" srcs/containers/grafana/srcs/datasource.yml
 cp srcs/containers/ftps/srcs/Source srcs/containers/ftps/Dockerfile
-sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/ftps/Dockerfile
+sed -i '' "s/CLUSTER_IP/$IP/g" srcs/containers/ftps/Dockerfile
 
 #############################################################################################################################
 
