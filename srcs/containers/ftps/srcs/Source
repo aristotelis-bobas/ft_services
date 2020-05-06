@@ -1,0 +1,17 @@
+# OPERATING SYSTEM
+FROM 		alpine
+
+# INSTALL PACKAGES
+RUN 		apk update && \
+			apk add openssl pure-ftpd --repository http://dl-3.alpinelinux.org/alpine/edge/testing
+
+# CONFIGURE SSL
+RUN 		openssl req -newkey rsa:2048 -nodes -x509 -days 365 \
+            -subj '/C=NL/L=Amsterdam/O=Codam/OU=42/CN=abobas' \
+            -keyout /etc/ssl/private/pure-ftpd.pem -out /etc/ssl/private/pure-ftpd.pem
+
+# CONFIGURE FTP
+RUN         echo 'root:password' | chpasswd
+
+# START SERVICE
+CMD         pure-ftpd -j -Y 2 -p 21000:21000 -P CLUSTER_IP

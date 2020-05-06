@@ -6,4 +6,4 @@ RUN 		apk update && \
 			apk add influxdb wget
 
 # START SERVICE
-CMD         influxd
+CMD         influxd run -config /etc/influxdb.conf

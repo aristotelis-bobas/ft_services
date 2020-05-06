@@ -56,7 +56,7 @@ spin()
     echo -n " \b\c"
 }
 
-services="nginx mysql phpmyadmin wordpress influxdb telegraf grafana"
+services="nginx mysql phpmyadmin wordpress influxdb telegraf grafana ftps"
 start=`date +%s`
 
 #############################################################################################################################
@@ -68,11 +68,12 @@ rm -rf srcs/containers/nginx/srcs/index.html & spin
 rm -rf srcs/containers/wordpress/Dockerfile & spin
 rm -rf srcs/containers/telegraf/srcs/telegraf.conf & spin
 rm -rf srcs/containers/grafana/srcs/datasource.yml & spin
+rm -rf srcs/containers/ftps/Dockerfile & spin
 
 #############################################################################################################################
 
 echo -n "\nSetting up minikube..."
-minikube start --cpus=2 --memory 2g --extra-config=apiserver.service-node-port-range=1-9000 > /dev/null 2>&1 & spin
+minikube start --cpus=2 --memory 2g --extra-config=apiserver.service-node-port-range=1-22000 > /dev/null 2>&1 & spin
 minikube addons enable dashboard > /dev/null 2>&1 & spin
 minikube addons enable ingress > /dev/null 2>&1 & spin
 eval $(minikube docker-env)
@@ -89,6 +90,8 @@ cp srcs/containers/telegraf/srcs/source.conf srcs/containers/telegraf/srcs/teleg
 sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/telegraf/srcs/telegraf.conf & spin
 cp srcs/containers/grafana/srcs/datasource_source.yml srcs/containers/grafana/srcs/datasource.yml & spin
 sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/grafana/srcs/datasource.yml & spin
+cp srcs/containers/ftps/srcs/Source srcs/containers/ftps/Dockerfile & spin
+sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/ftps/Dockerfile & spin
 
 #############################################################################################################################
 
@@ -105,6 +108,7 @@ rm -rf srcs/containers/nginx/srcs/index.html & spin
 rm -rf srcs/containers/wordpress/Dockerfile & spin
 rm -rf srcs/containers/telegraf/srcs/telegraf.conf & spin
 rm -rf srcs/containers/grafana/srcs/datasource.yml & spin
+rm -rf srcs/containers/ftps/Dockerfile & spin
 
 #############################################################################################################################
 
