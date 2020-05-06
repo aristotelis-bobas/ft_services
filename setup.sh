@@ -61,7 +61,24 @@ start=`date +%s`
 
 #############################################################################################################################
 
-echo -n "Cleaning files..."
+if ! brew ; then
+echo -n "\nInstalling Homebrew..."
+curl -fsSL https://rawgit.com/kube/42homebrew/master/install.sh | zsh > /dev/null 2>&1 & spin
+fi
+
+if ! minikube ; then
+echo -n "\nInstalling Minikube..."
+brew install minikube > /dev/null 2>&1 & spin
+fi
+
+if ! kubectl ; then
+echo -n "\nInstalling Kubernetes..."
+brew install kubectl > /dev/null 2>&1 & spin
+fi
+
+#############################################################################################################################
+
+echo -n "\nCleaning files..."
 minikube delete > /dev/null 2>&1 & spin
 docker system prune -f > /dev/null 2>&1 & spin
 rm -rf srcs/containers/nginx/srcs/index.html & spin
@@ -114,13 +131,27 @@ rm -rf srcs/containers/ftps/Dockerfile & spin
 
 end=`date +%s`
 runtime=$((end-start))
-echo "\n====================================================================================================="
+
+echo "\n=================================================================================================================="
 echo "\e[92mCluster succesfully deployed at http://$IP in $runtime seconds\e[0m"
-echo "====================================================================================================="
+echo "=================================================================================================================="
+
+echo "Login credentials for all services are user=root with password=password"
+echo "Enter container shell: kubectl exec -it \$(kubectl get pods | grep wordpress | cut -d\" \" -f1) -- sh" 
+echo "Restart container: kubectl exec -it \$(kubectl get pods | grep mysql | cut -d\" \" -f1) --  kill 1"
+echo "Connect to FTPS server: lftp -u root -p 21 $IP -e \"set ssl:verify-certificate/$IP no\""
+echo "Command to download inside FTPS server: mirror --verbose --use-pget-n=8 -c --verbose /file-to-download /directory-to-download-to"
+echo "Connect to Nginx container using SSH: ssh root@$IP"
+echo "Open Kubernetes web dashboard: minikube dashboard"
+echo "Show Kubernetes pods: kubectl get pods"
+echo "Show Kubernetes services: kubectl get services"
+echo "Show Kubernetes persistent storages: kubectl get pv"
+echo "=================================================================================================================="
+
 kubectl get pods
-echo "-----------------------------------------------------------------------------------------------------"
+echo "------------------------------------------------------------------------------------------------------------------"
 kubectl get services
-echo "-----------------------------------------------------------------------------------------------------"
+echo "------------------------------------------------------------------------------------------------------------------"
 kubectl get pv
-echo "-----------------------------------------------------------------------------------------------------"
+echo "------------------------------------------------------------------------------------------------------------------"
 
