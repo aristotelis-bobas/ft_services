@@ -61,17 +61,20 @@ start=`date +%s`
 
 #############################################################################################################################
 
-if ! brew ; then
+which -s brew
+if [[ $? != 0 ]] ; then
 echo -n "\nInstalling Homebrew..."
 curl -fsSL https://rawgit.com/kube/42homebrew/master/install.sh | zsh > /dev/null 2>&1 & spin
 fi
 
-if ! minikube ; then
+which -s minikube
+if [[ $? != 0 ]] ; then
 echo -n "\nInstalling Minikube..."
 brew install minikube > /dev/null 2>&1 & spin
 fi
 
-if ! kubectl ; then
+which -s kubectl
+if [[ $? != 0 ]] ; then
 echo -n "\nInstalling Kubernetes..."
 brew install kubectl > /dev/null 2>&1 & spin
 fi
