@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-echo "\e[91m
+echo "
 
       :::::::::: :::::::::::           ::::::::  :::::::::: :::::::::  :::     ::: ::::::::::: ::::::::  :::::::::: :::::::: 
      :+:            :+:              :+:    :+: :+:        :+:    :+: :+:     :+:     :+:    :+:    :+: :+:       :+:    :+: 
@@ -20,19 +20,19 @@ echo "\e[91m
  #+#            #+#              #+#    #+# #+#        #+#    #+#   #+#+#+#       #+#    #+#    #+# #+#       #+#    #+#     
 ###            ###    ########## ########  ########## ###    ###     ###     ########### ########  ########## ########       
 
-                                                                                        by abobas@student.codam.nl \n\e[0m"
+                                                                                        by abobas@student.codam.nl \n"
 
 #############################################################################################################################
 
 deploy()
 {
-    echo -n "\nDeploying $1..." 
+    printf "%s" "\nDeploying $1..." 
 	kubectl apply -f srcs/yml/$1.yml > /dev/null 2>&1 & spin
 }
 
 build()
 {
-	echo -n "\nBuilding $1..."
+	printf "%s" "\nBuilding $1..."
 	docker build -t services/$1 srcs/containers/$1 > /dev/null 2>&1 & spin
 }
 
@@ -53,7 +53,7 @@ spin()
         sleep 0.65
         echo "\b\c"
     done
-    echo -n " \b\c"
+    printf "%s" " \b\c"
 }
 
 services="nginx mysql phpmyadmin wordpress influxdb telegraf grafana ftps"
@@ -63,25 +63,25 @@ start=`date +%s`
 
 which -s brew
 if [[ $? != 0 ]] ; then
-echo -n "\nInstalling Homebrew..."
+printf "%s" "\nInstalling Homebrew..."
 curl -fsSL https://rawgit.com/kube/42homebrew/master/install.sh | zsh > /dev/null 2>&1 & spin
 fi
 
 which -s minikube
 if [[ $? != 0 ]] ; then
-echo -n "\nInstalling Minikube..."
+printf "%s" "\nInstalling Minikube..."
 brew install minikube > /dev/null 2>&1 & spin
 fi
 
 which -s kubectl
 if [[ $? != 0 ]] ; then
-echo -n "\nInstalling Kubernetes..."
+printf "%s" "\nInstalling Kubernetes..."
 brew install kubectl > /dev/null 2>&1 & spin
 fi
 
 #############################################################################################################################
 
-echo -n "\nCleaning files..."
+printf "%s" "\nCleaning files..."
 minikube delete > /dev/null 2>&1 & spin
 docker system prune -f > /dev/null 2>&1 & spin
 rm -rf srcs/containers/nginx/srcs/index.html & spin
@@ -92,7 +92,7 @@ rm -rf srcs/containers/ftps/Dockerfile & spin
 
 #############################################################################################################################
 
-echo -n "\nSetting up minikube..."
+printf "%s" "\nSetting up minikube..."
 minikube start --cpus=2 --memory 2g --extra-config=apiserver.service-node-port-range=1-22000 > /dev/null 2>&1 & spin
 minikube addons enable dashboard > /dev/null 2>&1 & spin
 minikube addons enable ingress > /dev/null 2>&1 & spin
@@ -100,7 +100,7 @@ eval $(minikube docker-env)
 
 #############################################################################################################################
 
-echo -n "\nPreparing temporary files..."
+printf "%s" "\nPreparing temporary files..."
 IP=`minikube ip`
 cp srcs/containers/nginx/srcs/source.html srcs/containers/nginx/srcs/index.html & spin
 sed -i "s/CLUSTER_IP/$IP/g" srcs/containers/nginx/srcs/index.html & spin
@@ -123,7 +123,7 @@ done
 
 #############################################################################################################################
 
-echo -n "\nCleaning temporary files..."
+printf "%s" "\nCleaning temporary files..."
 rm -rf srcs/containers/nginx/srcs/index.html & spin
 rm -rf srcs/containers/wordpress/Dockerfile & spin
 rm -rf srcs/containers/telegraf/srcs/telegraf.conf & spin
