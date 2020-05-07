@@ -50,7 +50,7 @@ fi
 which -s minikube
 if [[ $? != 0 ]] ; then
 echo "Installing minikube..."
-brew install minikube > /dev/null 2>&1 
+~/.brew/bin/brew install minikube > /dev/null 2>&1 
 fi
 
 #############################################################################################################################
