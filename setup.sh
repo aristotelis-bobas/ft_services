@@ -65,6 +65,7 @@ rm -rf srcs/containers/wordpress/Dockerfile
 rm -rf srcs/containers/telegraf/srcs/telegraf.conf
 rm -rf srcs/containers/grafana/srcs/datasource.yml
 rm -rf srcs/containers/ftps/Dockerfile
+pkill -9 -f "kubectl proxy" > /dev/null 2>&1 
 
 #############################################################################################################################
 
@@ -74,7 +75,6 @@ mkdir ~/goinfre/minikube
 rm -rf ~/.minikube/machines
 ln -s ~/goinfre/minikube ~/.minikube/machines
 minikube start --cpus=2 --memory 2g --disk-size 10g --driver=virtualbox --extra-config=apiserver.service-node-port-range=1-22000 > /dev/null 2>&1 
-minikube addons enable dashboard > /dev/null 2>&1 
 minikube addons enable ingress > /dev/null 2>&1 
 eval $(minikube docker-env)
 
@@ -101,6 +101,7 @@ do
     deploy $service
 done
 
+echo "Deploying dashboard..."
 kubectl apply -f srcs/yml/dashboard.yml > /dev/null 2>&1 
 kubectl proxy & > /dev/null 2>&1 
 
