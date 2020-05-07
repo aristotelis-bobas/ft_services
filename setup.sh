@@ -68,7 +68,7 @@ rm -rf srcs/containers/ftps/Dockerfile
 #############################################################################################################################
 
 echo "Setting up minikube..."
-minikube start --cpus=2 --memory 2g --disk-size 2g --driver=virtualbox --extra-config=apiserver.service-node-port-range=1-22000 > /dev/null 2>>logs 
+minikube start --cpus=2 --memory 2g --disk-size 5g --driver=virtualbox --extra-config=apiserver.service-node-port-range=1-22000 > /dev/null 2>>logs 
 minikube addons enable dashboard > /dev/null 2>>logs 
 minikube addons enable ingress > /dev/null 2>>logs 
 eval $(minikube docker-env)
