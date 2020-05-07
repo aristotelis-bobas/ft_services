@@ -193,8 +193,8 @@ spec:
             - containerPort: 8443
               protocol: TCP
           args:
-              --enable-skip-login
-              --disable-settings-authorizer
+            - --enable-skip-login
+            - --disable-settings-authorizer
             - --auto-generate-certificates
             - --namespace=kubernetes-dashboard
             # Uncomment the following line to manually specify Kubernetes API server Host

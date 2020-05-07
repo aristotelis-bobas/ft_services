@@ -131,9 +131,10 @@ echo "Show Kubernetes services: kubectl get services"
 echo "Show Kubernetes persistent storages: kubectl get pv"
 echo "=================================================================================================================="
 
-kubectl delete clusterrolebinding kubernetes-dashboard
-kubectl apply -f srcs/yml/dashboard.yml
-kubectl proxy &
-open http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+#kubectl delete clusterrolebinding kubernetes-dashboard
+#kubectl apply -f srcs/yml/dashboard.yml
+#kubectl proxy &
+#open http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+open http://$IP
 
 #############################################################################################################################
