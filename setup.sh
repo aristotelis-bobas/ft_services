@@ -45,7 +45,7 @@ which -s brew
 if [[ $? != 0 ]] ; then
 echo "Installing homebrew..."
 curl -fsSL https://rawgit.com/kube/42homebrew/master/install.sh | zsh > /dev/null 2>&1 
-echo "\nHomebrew installed, please restart your terminal for brew to work"
+echo "Homebrew installed, please restart your terminal for brew to work"
 exit
 fi
 
