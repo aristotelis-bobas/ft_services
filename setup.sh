@@ -101,6 +101,9 @@ do
     deploy $service
 done
 
+kubectl apply -f srcs/yml/dashboard.yml > /dev/null 2>&1 
+kubectl proxy & > /dev/null 2>&1 
+
 #############################################################################################################################
 
 echo "Cleaning temporary files..."
@@ -114,27 +117,14 @@ rm -rf srcs/containers/ftps/Dockerfile
 
 end=`date +%s`
 runtime=$((end-start))
+open http://$IP
 
 echo "\n=================================================================================================================="
 echo "Cluster succesfully deployed at http://$IP in $runtime seconds"
-echo "=================================================================================================================="
-
 echo "Login credentials for all services are user=root with password=password"
-echo "Enter container shell: kubectl exec -it \$(kubectl get pods | grep wordpress | cut -d\" \" -f1) -- sh" 
-echo "Restart container: kubectl exec -it \$(kubectl get pods | grep mysql | cut -d\" \" -f1) --  kill 1"
-echo "Connect to FTPS server: lftp -u root -p 21 $IP -e \"set ssl:verify-certificate/$IP no\""
-echo "Command to download inside FTPS server: mirror --verbose --use-pget-n=8 -c --verbose /file-to-download /directory-to-download-to"
-echo "Connect to Nginx container using SSH: ssh root@$IP"
-echo "Open Kubernetes web dashboard: minikube dashboard"
-echo "Show Kubernetes pods: kubectl get pods"
-echo "Show Kubernetes services: kubectl get services"
-echo "Show Kubernetes persistent storages: kubectl get pv"
 echo "=================================================================================================================="
-
-#kubectl delete clusterrolebinding kubernetes-dashboard
-#kubectl apply -f srcs/yml/dashboard.yml
-#kubectl proxy &
-#open http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
-open http://$IP
-
-#############################################################################################################################
+echo "Enter container: kubectl exec -it \$(kubectl get pods | grep 'service-name' | cut -d\" \" -f1) -- sh"
+echo "Connect using SSH: ssh root@$IP" 
+echo "Connect to FTPS server: lftp -u root -p 21 $IP -e \"set ssl:verify-certificate/$IP no\""
+echo "Download from FTPS server: mirror --use-pget-n=8 -c /source /destination"
+echo "=================================================================================================================="
