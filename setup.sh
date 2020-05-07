@@ -67,6 +67,8 @@ rm -rf srcs/containers/ftps/Dockerfile
 #############################################################################################################################
 
 echo "Setting up minikube..."
+rm -rf ~/.minikube
+mkdir ~/.minikube
 rm -rf ~/goinfre/minikube
 mkdir ~/goinfre/minikube
 rm -rf ~/.minikube/machines
