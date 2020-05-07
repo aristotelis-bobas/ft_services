@@ -14,4 +14,4 @@ RUN 		openssl req -newkey rsa:2048 -nodes -x509 -days 365 \
 RUN         echo 'root:password' | chpasswd
 
 # START SERVICE
-CMD         pure-ftpd -j -Y 2 -p 21000:21000 -P CLUSTER_IP
+CMD         pure-ftpd -j -Y 1 -p 21000:21000 -P CLUSTER_IP
