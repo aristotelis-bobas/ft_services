@@ -65,7 +65,7 @@ rm -rf srcs/containers/wordpress/Dockerfile
 rm -rf srcs/containers/telegraf/srcs/telegraf.conf
 rm -rf srcs/containers/grafana/srcs/datasource.yml
 rm -rf srcs/containers/ftps/Dockerfile
-pkill -9 -f "kubectl proxy" > /dev/null 2>&1 
+pkill -9 -f "kubectl proxy" && sleep 1 > /dev/null 2>&1 
 
 #############################################################################################################################
 
@@ -103,7 +103,7 @@ done
 
 echo "Deploying dashboard..."
 kubectl apply -f srcs/yml/dashboard.yml > /dev/null 2>&1 
-kubectl proxy & > /dev/null 2>&1 
+kubectl proxy & && sleep 1 > /dev/null 2>&1 
 
 #############################################################################################################################
 
