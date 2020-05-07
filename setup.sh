@@ -27,13 +27,13 @@ echo "
 deploy()
 {
     echo "Deploying $1..." 
-	kubectl apply -f srcs/yml/$1.yml > /dev/null 2>&1
+	kubectl apply -f srcs/yml/$1.yml > /dev/null 2>logs
 }
 
 build()
 {
 	echo "Building $1..."
-	docker build -t services/$1 srcs/containers/$1 > /dev/null 2>&1
+	docker build -t services/$1 srcs/containers/$1 > /dev/null 2>logs 
 }
 
 services="nginx mysql phpmyadmin wordpress influxdb telegraf grafana ftps"
@@ -44,20 +44,21 @@ start=`date +%s`
 which -s brew
 if [[ $? != 0 ]] ; then
 echo "Installing homebrew..."
-curl -fsSL https://rawgit.com/kube/42homebrew/master/install.sh | zsh > /dev/null 2>&1
+curl -fsSL https://rawgit.com/kube/42homebrew/master/install.sh | zsh > /dev/null 2>logs 
 fi
 
 which -s minikube
 if [[ $? != 0 ]] ; then
 echo "Installing minikube..."
-brew install minikube > /dev/null 2>&1
+brew install minikube > /dev/null 2>logs 
 fi
 
 #############################################################################################################################
 
 echo "Cleaning files..."
-minikube delete > /dev/null 2>&1
-docker system prune -f > /dev/null 2>&1
+minikube delete > /dev/null 2>logs 
+docker system prune -f > /dev/null 2>logs
+rm -rf logs 
 rm -rf srcs/containers/nginx/srcs/index.html
 rm -rf srcs/containers/wordpress/Dockerfile
 rm -rf srcs/containers/telegraf/srcs/telegraf.conf
@@ -67,9 +68,9 @@ rm -rf srcs/containers/ftps/Dockerfile
 #############################################################################################################################
 
 echo "Setting up minikube..."
-minikube start --cpus=2 --memory 2g --disk-size 2g --driver=virtualbox --extra-config=apiserver.service-node-port-range=1-22000 > /dev/null 2>&1
-minikube addons enable dashboard > /dev/null 2>&1
-minikube addons enable ingress > /dev/null 2>&1
+minikube start --cpus=2 --memory 2g --disk-size 2g --driver=virtualbox --extra-config=apiserver.service-node-port-range=1-22000 > /dev/null 2>logs 
+minikube addons enable dashboard > /dev/null 2>logs 
+minikube addons enable ingress > /dev/null 2>logs 
 eval $(minikube docker-env)
 
 #############################################################################################################################
