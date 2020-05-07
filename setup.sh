@@ -38,6 +38,7 @@ build()
 
 services="nginx mysql phpmyadmin wordpress influxdb telegraf grafana ftps"
 start=`date +%s`
+rm -rf logs
 
 #############################################################################################################################
 
@@ -58,7 +59,6 @@ fi
 echo "Cleaning files..."
 minikube delete > /dev/null 2>logs 
 docker system prune -f > /dev/null 2>logs
-rm -rf logs 
 rm -rf srcs/containers/nginx/srcs/index.html
 rm -rf srcs/containers/wordpress/Dockerfile
 rm -rf srcs/containers/telegraf/srcs/telegraf.conf
