@@ -27,38 +27,37 @@ echo "
 deploy()
 {
     echo "Deploying $1..." 
-	kubectl apply -f srcs/yml/$1.yml > /dev/null 2>>logs
+	kubectl apply -f srcs/yml/$1.yml > /dev/null 2>&1
 }
 
 build()
 {
 	echo "Building $1..."
-	docker build -t services/$1 srcs/containers/$1 > /dev/null 2>>logs 
+	docker build -t services/$1 srcs/containers/$1 > /dev/null 2>&1 
 }
 
 services="nginx mysql phpmyadmin wordpress influxdb telegraf grafana ftps"
 start=`date +%s`
-rm -rf logs
 
 #############################################################################################################################
 
 which -s brew
 if [[ $? != 0 ]] ; then
 echo "Installing homebrew..."
-curl -fsSL https://rawgit.com/kube/42homebrew/master/install.sh | zsh > /dev/null 2>>logs 
+curl -fsSL https://rawgit.com/kube/42homebrew/master/install.sh | zsh > /dev/null 2>&1 
 fi
 
 which -s minikube
 if [[ $? != 0 ]] ; then
 echo "Installing minikube..."
-brew install minikube > /dev/null 2>>logs 
+brew install minikube > /dev/null 2>&1 
 fi
 
 #############################################################################################################################
 
 echo "Cleaning files..."
-minikube delete > /dev/null 2>>logs 
-docker system prune -f > /dev/null 2>>logs
+minikube delete > /dev/null 2>&1 
+docker system prune -f > /dev/null 2>&1
 rm -rf srcs/containers/nginx/srcs/index.html
 rm -rf srcs/containers/wordpress/Dockerfile
 rm -rf srcs/containers/telegraf/srcs/telegraf.conf
@@ -68,9 +67,13 @@ rm -rf srcs/containers/ftps/Dockerfile
 #############################################################################################################################
 
 echo "Setting up minikube..."
-minikube start --cpus=2 --memory 2g --disk-size 10g --driver=virtualbox --extra-config=apiserver.service-node-port-range=1-22000 > /dev/null 2>>logs 
-minikube addons enable dashboard > /dev/null 2>>logs 
-minikube addons enable ingress > /dev/null 2>>logs 
+rm -rf ~/goinfre/minikube
+mkdir ~/goinfre/minikube
+rm -rf ~/.minikube/machines
+ln -s ~/goinfre/minikube ~/.minikube/machines
+minikube start --cpus=2 --memory 2g --disk-size 10g --driver=virtualbox --extra-config=apiserver.service-node-port-range=1-22000 > /dev/null 2>&1 
+minikube addons enable dashboard > /dev/null 2>&1 
+minikube addons enable ingress > /dev/null 2>&1 
 eval $(minikube docker-env)
 
 #############################################################################################################################
