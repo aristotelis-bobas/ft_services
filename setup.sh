@@ -103,7 +103,7 @@ done
 
 echo "Deploying dashboard..."
 kubectl apply -f srcs/yml/dashboard.yml > /dev/null 2>&1 
-(kubectl proxy &) && sleep 1 > /dev/null 2>&1 
+((kubectl proxy &) && sleep 1) > /dev/null 2>&1 
 
 #############################################################################################################################
 
