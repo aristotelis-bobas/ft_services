@@ -60,12 +60,12 @@ fi
 echo "Cleaning files..."
 minikube delete > /dev/null 2>&1 
 docker system prune -f > /dev/null 2>&1
+pkill -9 -f "kubectl proxy" && sleep 1 > /dev/null 2>&1 
 rm -rf srcs/containers/nginx/srcs/index.html
 rm -rf srcs/containers/wordpress/Dockerfile
 rm -rf srcs/containers/telegraf/srcs/telegraf.conf
 rm -rf srcs/containers/grafana/srcs/datasource.yml
 rm -rf srcs/containers/ftps/Dockerfile
-pkill -9 -f "kubectl proxy" && sleep 1 > /dev/null 2>&1 
 
 #############################################################################################################################
 
@@ -120,7 +120,7 @@ end=`date +%s`
 runtime=$((end-start))
 open http://$IP
 
-echo "\n=================================================================================================================="
+echo "=================================================================================================================="
 echo "Cluster succesfully deployed at http://$IP in $runtime seconds"
 echo "Login credentials for all services are user=root with password=password"
 echo "=================================================================================================================="
