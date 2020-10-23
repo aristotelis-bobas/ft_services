@@ -13,6 +13,3 @@ The following services were deployed:
 The Nginx server supports SSL and SSH. <br>
 All containers are built on Alpine Linux. <br>
 The MySQL and InfluxDB databases have persistent storage.
-
-
-I finished the project on 12/05/2020 with a grade of 100%.
