@@ -1,7 +1,5 @@
 # ft_services
 
-## Project
-
 This is a project for Codam (42 Network). <br>
 
 The assignment consisted of deploying a multi-service cluster using Kubernetes and Docker containers. <br>
